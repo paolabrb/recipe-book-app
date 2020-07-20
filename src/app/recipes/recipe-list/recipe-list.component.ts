@@ -8,7 +8,8 @@ import { Recipe } from '../recipe.model';
 })
 export class RecipeListComponent implements OnInit {
   recipes: Recipe[] = [
-    new Recipe('A test recipe', 'test desc', 'https://statics.cucchiaio.it/content/cucchiaio/it/ricette/2019/08/cheesecake-fredda/jcr:content/header-par/image-single.img10.jpg/1565969479875.jpg')
+    new Recipe('A test recipe', 'test desc', 'https://statics.cucchiaio.it/content/cucchiaio/it/ricette/2019/08/cheesecake-fredda/jcr:content/header-par/image-single.img10.jpg/1565969479875.jpg'),
+    new Recipe('A second recipe', 'test desc 2', 'https://statics.cucchiaio.it/content/cucchiaio/it/ricette/2019/08/cheesecake-fredda/jcr:content/header-par/image-single.img10.jpg/1565969479875.jpg')
   ];
 
   constructor() { }
