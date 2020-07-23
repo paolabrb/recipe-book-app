@@ -1,12 +1,28 @@
 import { Recipe } from './recipe.model';
 import { EventEmitter } from '@angular/core';
+import { Ingredient } from '../shared/ingredient.model';
 
 export class RecipeService {
     recipeSelected = new EventEmitter<Recipe>();
-    
+
     private recipes: Recipe[] = [
-        new Recipe('A test recipe', 'test desc', 'https://statics.cucchiaio.it/content/cucchiaio/it/ricette/2019/08/cheesecake-fredda/jcr:content/header-par/image-single.img10.jpg/1565969479875.jpg'),
-        new Recipe('A second recipe', 'test desc 2', 'https://statics.cucchiaio.it/content/cucchiaio/it/ricette/2019/08/cheesecake-fredda/jcr:content/header-par/image-single.img10.jpg/1565969479875.jpg')
+        new Recipe('Tiramisu', 'Italian traditional tiramisu', 'https://images.lacucinaitaliana.it/gallery/84543/Big/f9f08f5d-9e23-42ce-8340-5d96ee99cf7c.jpg', [
+            new Ingredient('Italian Sponge Fingers', 30),
+            new Ingredient('Coffee', 1),
+            new Ingredient('Mascarpone', 500),
+            new Ingredient('Eggs', 3),
+            new Ingredient('Sugar', 150),
+            new Ingredient('Cocoa', 1)
+        ]),
+        new Recipe('Cheeseburger', 'American Cheeseburger', 'https://i2.wp.com/www.foodrepublic.com/wp-content/uploads/2012/03/033_FR11785.jpg?fit=1000%2C665&ssl=1', [
+            new Ingredient('Buns', 1),
+            new Ingredient('Patty', 1),
+            new Ingredient('Onions', 1),
+            new Ingredient('Pickles', 2),
+            new Ingredient('Lettuce', 2),
+            new Ingredient('Tomatoes', 1),
+            new Ingredient('Cheese', 3)
+        ])
       ];
 
     getRecipes() {
