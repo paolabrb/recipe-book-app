@@ -8,8 +8,7 @@
     <div class="col-xs-12">
         <app-recipe-item 
         *ngFor="let recipeItem of recipes" 
-        [recipe]="recipeItem"
-        (recipeSelected)="showRecipe(recipeItem)">
+        [recipe]="recipeItem">
         </app-recipe-item>
     </div>
 </div>
