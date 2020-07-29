@@ -1,9 +1,11 @@
 import { Recipe } from './recipe.model';
 import { EventEmitter } from '@angular/core';
 import { Ingredient } from '../shared/ingredient.model';
+import { Subject } from 'rxjs';
 
 export class RecipeService {
     recipeSelected = new EventEmitter<Recipe>();
+    recipesChanged = new Subject<Recipe[]>();
 
     private recipes: Recipe[] = [
         new Recipe('Tiramisu', 'Italian traditional tiramisu', 'https://images.lacucinaitaliana.it/gallery/84543/Big/f9f08f5d-9e23-42ce-8340-5d96ee99cf7c.jpg', [
@@ -34,4 +36,18 @@ export class RecipeService {
         return this.recipes[id];
     }
 
+    addRecipe(recipe: Recipe) {
+        this.recipes.push(recipe);
+        this.recipesChanged.next(this.recipes.slice());
+    }
+
+    updateRecipe(index: number, newRecipe: Recipe) {
+        this.recipes[index] = newRecipe;
+        this.recipesChanged.next(this.recipes.slice());
+    }
+    
+    deleteRecipe(index: number) {
+        this.recipes.splice(index, 1);
+        this.recipesChanged.next(this.recipes.slice());
+    }
 }
