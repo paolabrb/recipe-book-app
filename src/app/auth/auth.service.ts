@@ -5,6 +5,7 @@ import { throwError, BehaviorSubject } from 'rxjs';
 import { User } from './user.model';
 import { Router } from '@angular/router';
 
+// interface to show TS how the response data is structured (taken from Firebase, depends on API)
 export interface AuthResponseData {
     kind: string;
     idToken: string;
@@ -18,12 +19,19 @@ export interface AuthResponseData {
 @Injectable({ providedIn: 'root' })
 
 export class AuthService {
+    // user as BehaviorSubject can be started as null and subscribed to to update with new data (localstorage Data to have an autologin)
     user = new BehaviorSubject<User>(null);
+
+    //token expiration timer set to a property - it gets set with the autologout and cleared on logout to not fire autologout
     private tokenExpTimer: any;
 
     constructor(
         private http: HttpClient,
         private router: Router) {}
+
+    // we pass AuthResponseData to tell which response to await from post request, the call .pipe() on the response to 
+    // a. catch error (done with handleError())
+    // b. tap runs and returns a mirrored Observable of the original one, then sends the request data to handleAuthentication()
 
     signup(email: string, password: string) {
         return this.http.post<AuthResponseData>(
@@ -42,6 +50,7 @@ export class AuthService {
             );
     }
 
+    // login same as sign up +/-
     login(email: string, password: string) {
         return this.http.post<AuthResponseData>(
             'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDU3niK4mhCPqJek_4mT6kcCgGmp1QfNV0',
@@ -58,6 +67,8 @@ export class AuthService {
             })
         );
     }
+
+    // autoLogin() parses localStorage for user data and parses it to have an object and build a User with it; then if a token is provided a session w/ new loadedUser is fired, expiration duration is set (time of now - token exp date in milliseconds) and autologout is set
 
     autoLogin() {
         const userData: {
@@ -87,6 +98,7 @@ export class AuthService {
         }
     }
 
+    // logout sets user to null, navigates back to auth route, removes the user data from the local storage and clears the expiration timer
     logout() {
        this.user.next(null); 
        this.router.navigate(['/auth']);
@@ -96,12 +108,17 @@ export class AuthService {
        }
     }
 
+    // autologout takes the expiration duration milliseconds and sets the property tokenExpTimer to a timeout that fires logout()
+
     autoLogout(expirationDuration: number) {
         this.tokenExpTimer = setTimeout(() => {
             this.logout();
         }, expirationDuration)
     }
 
+    // PRIVATE METHODS
+
+    // it sets needed parameters, calculates the expirationDate based on the number, creates a new user and updates the observable, sets autologout and passes the data as a string to localstorage
 
     private handleAuthentication(
         email: string, 
@@ -118,6 +135,8 @@ export class AuthService {
 
         localStorage.setItem('userData', JSON.stringify(user));
     }
+
+    // handleError sets a default message and checks if the response data contains errors, then checks via switch statement to display custom messages
 
     private handleError(errorRes: HttpErrorResponse) {
         let errorMessage = 'An unknown error occurred!';
