@@ -3,9 +3,11 @@ import { switchMap, catchError, map, tap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { User } from '../user.model';
+import { AuthService } from '../auth.service';
 
 export interface AuthResponseData {
     kind: string;
@@ -23,11 +25,12 @@ export class AuthEffects {
     constructor(
         private actions$: Actions,
         private http: HttpClient,
-        private router: Router
+        private router: Router,
+        private authService: AuthService
     ) {}
     
 
-    // first effect authLogin
+    // LOGIN
     @Effect()
     // property authlogin is observable
     authLogin = this.actions$.pipe(
@@ -44,6 +47,9 @@ export class AuthEffects {
                     returnSecureToken: true
                 }
             ).pipe(
+                tap(resData => {
+                    this.authService.setLogoutTimer(+resData.expiresIn * 1000)
+                }),
                 // take the response data and map it
                 map(resData => {
                     return handleAuthentication(resData);
@@ -56,16 +62,52 @@ export class AuthEffects {
 
     );
 
-    // second effect to handle redirect to homepage after successful login - it will not yield any dispatchable action
+    // AUTOLOGIN
+    // autoLogin() parses localStorage for user data and parses it to have an object and build a User with it; then if a token is provided a session w/ new loadedUser is fired, expiration duration is set (time of now - token exp date in milliseconds) and autologout is set
 
-    @Effect({dispatch: false})
-    authRedirect = this.actions$
+    @Effect()
+    autoLogin = this.actions$
     .pipe(
-        ofType(AuthActions.AUTHENTICATE_SUCCESS, AuthActions.LOGOUT),
-        tap(() => {
-            this.router.navigate(['/']);
-        })
+       ofType(AuthActions.AUTOLOGIN),
+       map(() => {
+        const userData: {
+            email: string;
+            id: string;
+            _token: string;
+            _tokenExpirationDate: string;
+        } = JSON.parse(localStorage.getItem('userData'));
+
+        if (!userData) {
+            return { type: 'Test'};
+        }
+
+        const loadedUser = new User(
+            userData.email, 
+            userData.id, 
+            userData._token, 
+            new Date(userData._tokenExpirationDate)
+            );
+        
+        if (loadedUser.token) {
+            const expDuration = new Date(
+            userData._tokenExpirationDate
+            ).getTime() - new Date().getTime();
+
+            this.authService.setLogoutTimer(expDuration);
+
+            return new AuthActions.AuthenticateSuccess({
+                    email: loadedUser.email,
+                    userId: loadedUser.id,
+                    token: loadedUser.token,
+                    expirationDate: new Date(userData._tokenExpirationDate)
+                })
+
+        }
+        return { type: 'Test'};
+       })
     )
+
+    // SIGNUP
 
     @Effect()
     authSignup = this.actions$
@@ -80,6 +122,9 @@ export class AuthEffects {
                     returnSecureToken: true
                 }
             ).pipe(
+                tap(resData => {
+                    this.authService.setLogoutTimer(+resData.expiresIn * 1000)
+                }),
                 // take the response data and map it
                 map(resData => {
                     return handleAuthentication(resData);
@@ -90,10 +135,46 @@ export class AuthEffects {
             ))
         })
     )
+
+    // LOGOUT sets user to null, navigates back to auth route, removes the user data from the local storage and clears the expiration timer
+
+    @Effect({dispatch: false})
+    authLogout = this.actions$
+    .pipe(
+        ofType(AuthActions.LOGOUT),
+        tap(() => {
+            this.authService.clearLogoutTimer();
+            localStorage.removeItem('userData');
+            this.router.navigate(['/auth']);
+        })
+    )
+
+
+    // REDIRECT - handle redirect to homepage after successful login - it will not yield any dispatchable action
+
+    @Effect({dispatch: false})
+    authRedirect = this.actions$
+    .pipe(
+        ofType(AuthActions.AUTHENTICATE_SUCCESS),
+        tap(() => {
+            this.router.navigate(['/']);
+        })
+    )
 }
+
+// it sets needed parameters, calculates the expirationDate based on the number, creates a new user and updates the observable, sets autologout and passes the data as a string to localstorage
 
 const handleAuthentication = (responseData) => {
     const expirationDate = new Date(new Date().getTime() + +responseData.expiresIn * 1000);
+
+    const user = new User(
+        responseData.email,
+        responseData.localId,
+        responseData.idToken,
+        expirationDate
+    );
+
+    localStorage.setItem('userData', JSON.stringify(user));
     // return new login action with data from response
     return new AuthActions.AuthenticateSuccess({
             email: responseData.email,
@@ -102,6 +183,8 @@ const handleAuthentication = (responseData) => {
             expirationDate: expirationDate
         });
 };
+
+// handleError sets a default message and checks if the response data contains errors, then checks via switch statement to display custom messages
 
 const handleError = (errorResponse) => {
     let errorMessage = 'An unknown error occurred!';
