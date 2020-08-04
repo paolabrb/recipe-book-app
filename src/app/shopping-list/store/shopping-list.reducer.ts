@@ -1,3 +1,5 @@
+// ALL the code in reducer is syncronous
+
 import { Ingredient } from '../../shared/ingredient.model';
 import * as ShoppingListActions from './shopping-list.actions';
 
@@ -12,7 +14,7 @@ export interface AppState {
     shoppingList: State;
 }
 
-// set initial state
+// set initial state with ingredients array (could be empty), editedIngredient as null and its index -1 (0 would be valid)
 
 const initialState: State = {
     ingredients: [
