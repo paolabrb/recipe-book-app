@@ -6,6 +6,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 // components
 
@@ -21,6 +22,10 @@ import { AuthInterceptorService } from './auth/auth-interceptor.service';
 
 import * as fromRoot from './store/app.reducer';
 
+// effects
+
+import { AuthEffects } from './auth/store/auth.effects';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,7 +36,8 @@ import * as fromRoot from './store/app.reducer';
     AppRoutingModule,
     StoreModule.forRoot(fromRoot.appReducer),
     HttpClientModule, 
-    SharedModule   
+    SharedModule,
+    EffectsModule.forRoot([AuthEffects]) 
   ],
   providers: [
     RecipeService, 
