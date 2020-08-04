@@ -7,6 +7,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
 // components
 
@@ -25,6 +27,7 @@ import * as fromRoot from './store/app.reducer';
 // effects
 
 import { AuthEffects } from './auth/store/auth.effects';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,9 @@ import { AuthEffects } from './auth/store/auth.effects';
     StoreModule.forRoot(fromRoot.appReducer),
     HttpClientModule, 
     SharedModule,
-    EffectsModule.forRoot([AuthEffects]) 
+    EffectsModule.forRoot([AuthEffects]),
+    StoreDevtoolsModule.instrument({ logOnly: environment.production }),
+    StoreRouterConnectingModule.forRoot()
   ],
   providers: [
     RecipeService, 
