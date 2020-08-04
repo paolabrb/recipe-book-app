@@ -29,7 +29,7 @@ import { AuthEffects } from './auth/store/auth.effects';
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

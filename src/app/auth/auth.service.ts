@@ -35,44 +35,6 @@ export class AuthService {
         private store: Store<fromApp.AppState>
     ) {}
 
-    // we pass AuthResponseData to tell which response to await from post request, the call .pipe() on the response to 
-    // a. catch error (done with handleError())
-    // b. tap runs and returns a mirrored Observable of the original one, then sends the request data to handleAuthentication()
-
-    signup(email: string, password: string) {
-        return this.http.post<AuthResponseData>(
-                'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + environment.firebaseApiKey, 
-                {
-                    email: email,
-                    password: password,
-                    returnSecureToken: true
-                }
-            )
-            .pipe(
-                catchError(this.handleError), 
-                tap(resData => {
-                    this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn)
-                })
-            );
-    }
-
-    // login same as sign up +/-
-    login(email: string, password: string) {
-        return this.http.post<AuthResponseData>(
-            'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + environment.firebaseApiKey,
-            {
-                email: email,
-                password: password,
-                returnSecureToken: true
-            }
-        )
-        .pipe(
-            catchError(this.handleError), 
-            tap(resData => {
-                this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn)
-            })
-        );
-    }
 
     // autoLogin() parses localStorage for user data and parses it to have an object and build a User with it; then if a token is provided a session w/ new loadedUser is fired, expiration duration is set (time of now - token exp date in milliseconds) and autologout is set
 
@@ -97,7 +59,7 @@ export class AuthService {
         
         if (loadedUser.token) {
             this.store.dispatch(
-                new AuthActions.Login({
+                new AuthActions.AuthenticateSuccess({
                     email: loadedUser.email,
                     userId: loadedUser.id,
                     token: loadedUser.token,
@@ -117,7 +79,6 @@ export class AuthService {
        this.store.dispatch(
            new AuthActions.Logout()
        )
-       this.router.navigate(['/auth']);
        localStorage.removeItem('userData');
        if (this.tokenExpTimer) {
            clearTimeout(this.tokenExpTimer);
@@ -148,7 +109,7 @@ export class AuthService {
         const user = new User(email, userId, token, expirationDate);
 
         this.store.dispatch(
-            new AuthActions.Login({
+            new AuthActions.AuthenticateSuccess({
                 email: email,
                 userId: userId,
                 token: token,
