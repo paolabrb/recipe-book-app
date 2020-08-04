@@ -5,6 +5,9 @@ import { throwError, BehaviorSubject } from 'rxjs';
 import { User } from './user.model';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 // interface to show TS how the response data is structured (taken from Firebase, depends on API)
 export interface AuthResponseData {
@@ -21,14 +24,16 @@ export interface AuthResponseData {
 
 export class AuthService {
     // user as BehaviorSubject can be started as null and subscribed to to update with new data (localstorage Data to have an autologin)
-    user = new BehaviorSubject<User>(null);
+    // user = new BehaviorSubject<User>(null);
 
     //token expiration timer set to a property - it gets set with the autologout and cleared on logout to not fire autologout
     private tokenExpTimer: any;
 
     constructor(
         private http: HttpClient,
-        private router: Router) {}
+        private router: Router,
+        private store: Store<fromApp.AppState>
+    ) {}
 
     // we pass AuthResponseData to tell which response to await from post request, the call .pipe() on the response to 
     // a. catch error (done with handleError())
@@ -91,7 +96,14 @@ export class AuthService {
             );
         
         if (loadedUser.token) {
-            this.user.next(loadedUser);
+            this.store.dispatch(
+                new AuthActions.Login({
+                    email: loadedUser.email,
+                    userId: loadedUser.id,
+                    token: loadedUser.token,
+                    expirationDate: new Date(userData._tokenExpirationDate)
+                })
+            );
             const expDuration = new Date(
                 userData._tokenExpirationDate
             ).getTime() - new Date().getTime();
@@ -101,7 +113,10 @@ export class AuthService {
 
     // logout sets user to null, navigates back to auth route, removes the user data from the local storage and clears the expiration timer
     logout() {
-       this.user.next(null); 
+    //    this.user.next(null); 
+       this.store.dispatch(
+           new AuthActions.Logout()
+       )
        this.router.navigate(['/auth']);
        localStorage.removeItem('userData');
        if (this.tokenExpTimer) {
@@ -129,9 +144,17 @@ export class AuthService {
     ) {
         const expirationDate = new Date(new Date().getTime() + +expiresIn * 1000);
 
+        // this.user.next(user);
         const user = new User(email, userId, token, expirationDate);
 
-        this.user.next(user);
+        this.store.dispatch(
+            new AuthActions.Login({
+                email: email,
+                userId: userId,
+                token: token,
+                expirationDate: expirationDate
+            })
+        )
         this.autoLogout(expiresIn * 1000);
 
         localStorage.setItem('userData', JSON.stringify(user));
