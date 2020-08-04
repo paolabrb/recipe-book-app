@@ -48,28 +48,32 @@ export function shoppingListReducer(
             };
       case ShoppingListActions.UPDATE_INGREDIENT:
           // save selected ingredient to a variable 
-          const ingredient = state.ingredients[action.payload.index];
+          const ingredient = state.ingredients[state.editedIngredientIndex];
 
           // define updatedIng by spreading the old one and then the updated one
           const updatedIngredient = {
               ...ingredient,
               // so you can keep f.e. IDs of the old one 
-              ...action.payload.ingredient
+              ...action.payload
           }
 
           const updatedIngredients = [...state.ingredients];
-          updatedIngredients[action.payload.index] = updatedIngredient;
+          updatedIngredients[state.editedIngredientIndex] = updatedIngredient;
           return {
             ...state,
-            ingredients: updatedIngredients
+            ingredients: updatedIngredients,
+            editedIngredientIndex: -1,
+            editedIngredient: null
           };
       case ShoppingListActions.DELETE_INGREDIENT:
         
         return {
             ...state,
             ingredients: state.ingredients.filter((ig, i) => {
-                return i != action.payload;
-            })
+                return i != state.editedIngredientIndex;
+            }),
+            editedIngredientIndex: -1,
+            editedIngredient: null
         };
       case ShoppingListActions.START_EDIT:
           return {
