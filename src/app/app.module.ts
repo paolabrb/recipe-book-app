@@ -17,7 +17,6 @@ import { HeaderComponent } from './header/header.component';
 
 // services
 
-import { RecipeService } from './recipes/recipe.service';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 
 // reducers 
@@ -27,6 +26,7 @@ import * as fromRoot from './store/app.reducer';
 // effects
 
 import { AuthEffects } from './auth/store/auth.effects';
+import { RecipeEffects } from './recipes/store/recipe.effects';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -40,12 +40,11 @@ import { environment } from '../environments/environment';
     StoreModule.forRoot(fromRoot.appReducer),
     HttpClientModule, 
     SharedModule,
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, RecipeEffects]),
     StoreDevtoolsModule.instrument({ logOnly: environment.production }),
     StoreRouterConnectingModule.forRoot()
   ],
   providers: [
-    RecipeService, 
     {provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptorService,
     multi: true}

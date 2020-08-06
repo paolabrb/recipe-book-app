@@ -1,11 +1,17 @@
-
+// angular
 import { Component, ComponentFactoryResolver, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+
+// rxjs
 import { Observable, Subscription } from 'rxjs';
+
+// ngrx
+import { Store } from '@ngrx/store';
+
+// others
 import { AuthResponseData } from './auth.service';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
-import { Store } from '@ngrx/store';
 import * as fromApp from '../store/app.reducer';
 import * as AuthActions from './store/auth.actions';
 

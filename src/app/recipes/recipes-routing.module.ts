@@ -1,10 +1,13 @@
+// angular
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+// recipes
 import { RecipesComponent } from './recipes.component';
 import { RecipeStartComponent } from './recipe-start/recipe-start.component';
 import { RecipeEditComponent } from './recipe-edit/recipe-edit.component';
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { RecipesResolverService } from './recipes-resolver.service';
+// auth
 import { AuthGuard } from '../auth/auth.guard';
 
 
