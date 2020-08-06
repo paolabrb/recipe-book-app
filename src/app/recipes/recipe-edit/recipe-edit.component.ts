@@ -1,11 +1,19 @@
+// angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import * as fromApp from '../../store/app.reducer';
+import { 
+  FormGroup, 
+  FormControl, 
+  FormArray, 
+  Validators } from '@angular/forms';
+// rxjs
 import { map } from 'rxjs/operators';
-import * as RecipesActions from  '../store/recipe.actions';
 import { Subscription } from 'rxjs';
+// ngrx
+import { Store } from '@ngrx/store';
+//
+import * as fromApp from '../../store/app.reducer';
+import * as RecipesActions from  '../store/recipe.actions';
 
 @Component({
   selector: 'app-recipe-edit',
@@ -112,7 +120,7 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
           }
         });
       };
-      
+
     // if adding a new recipe
 
     this.recipeForm = new FormGroup({

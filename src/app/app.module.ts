@@ -17,7 +17,6 @@ import { HeaderComponent } from './header/header.component';
 
 // services
 
-import { RecipeService } from './recipes/recipe.service';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 
 // reducers 
@@ -46,7 +45,6 @@ import { environment } from '../environments/environment';
     StoreRouterConnectingModule.forRoot()
   ],
   providers: [
-    RecipeService, 
     {provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptorService,
     multi: true}

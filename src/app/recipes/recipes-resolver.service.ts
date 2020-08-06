@@ -1,13 +1,20 @@
+// angular
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-
+import { 
+    Resolve, 
+    ActivatedRouteSnapshot, 
+    RouterStateSnapshot } 
+from '@angular/router';
+// rxjs
+import { of } from 'rxjs';
+import { take, map, switchMap } from 'rxjs/operators';
+// ngrx
+import { Store } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
+//
 import { Recipe } from './recipe.model';
-import { Store, reduceState } from '@ngrx/store';
 import * as fromApp from '../store/app.reducer';
 import * as RecipesActions from '../recipes/store/recipe.actions';
-import { Actions, ofType } from '@ngrx/effects';
-import { take, map, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 

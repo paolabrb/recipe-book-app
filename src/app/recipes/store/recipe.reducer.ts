@@ -1,6 +1,5 @@
 import { Recipe } from '../recipe.model';
 import * as RecipesActions from './recipe.actions';
-import { act } from '@ngrx/effects';
 
 export interface State {
     recipes: Recipe[]    

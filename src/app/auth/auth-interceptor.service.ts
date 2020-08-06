@@ -1,8 +1,16 @@
+// Angular, rxjs, ngrx imports
+
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpParams } from '@angular/common/http'
 import { exhaustMap, take, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
+
+// services
+
+import { AuthService } from './auth.service';
+
+// reducers
+
 import * as fromApp from '../store/app.reducer';
 
 @Injectable()
